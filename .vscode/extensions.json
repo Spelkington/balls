@@ -1,3 +1,10 @@
 {
-  "recommendations": ["roblox-ts.vscode-roblox-ts", "dbaeumer.vscode-eslint"]
+  "recommendations": [
+    "roblox-ts.vscode-roblox-ts",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "evaera.vscode-rojo",
+    "muoshuu.rojo-ui",
+    "vscodevim.vim"
+  ]
 }
