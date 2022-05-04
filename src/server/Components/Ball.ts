@@ -7,12 +7,32 @@ class Ball implements Component.ComponentClass {
   // ===== ATTRIBUTES =====
   // ======================
 
+  /**
+   * Tag used to reference the object in Knit and the CollectionService
+   */
   public static Tag = "Ball";
+
+  /**
+   * Base model used to spawn new Balls
+   */
   private static BASE_BALL_MODEL: ServerStorage["BallModel"] = ServerStorage.BallModel;
-  private static UNIT_VECTOR: Vector3 = new Vector3(1, 1, 1);
+
+  /**
+   * Maximum volume and size that food can be relative to Ball size in order to be eaten
+   */
   private static FOOD_VOLUME_CONSTRAINT = 0.5;
+
+  /**
+   * Maximum mass that food can be relative to Ball size in order to be eaten
+   */
   private static FOOD_MASS_CONSTRAINT = 0.5;
+
+  /**
+   * Legal children for the
+   */
   private static LEGAL_FOOD_CHILDREN = new Set<string>(["Texture", "Constraint"]);
+
+  private static UNIT_VECTOR: Vector3 = new Vector3(1, 1, 1);
 
   public Owner: Player;
   public BallJanitor: Janitor = new Janitor();
