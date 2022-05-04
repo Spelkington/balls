@@ -1,29 +1,29 @@
 interface ServerStorage extends Instance {
-  BallModel: Model & {
-    Membrane: Part & {
-      MembraneAttachment: Attachment;
-    };
-    Humanoid: Humanoid;
-    BodyAlignments: Folder & {
-      AlignMembrane: AlignPosition;
-      AlignHead: AlignPosition;
-      AlignMembraneOrientation: AlignOrientation;
-    };
-    Head: Part & {
-      HeadAttachment: Attachment;
-    };
-    WarpWelds: Folder & {
-      HeadWeld: WeldConstraint;
-      MembraneWeld: WeldConstraint;
-    };
-    Food: Model;
-    HumanoidRootPart: Part & {
-      RootAttachment: Attachment;
-    };
-    FoodWelds: Folder;
-  };
-  TagList: Folder & {
-    Edible: Configuration;
-    Ball: Configuration;
-  };
+	TagList: Folder & {
+		Edible: Configuration;
+		Ball: Configuration;
+	};
+	BallModel: Model & {
+		Core: Part & {
+			CoreAttachment: Attachment;
+		};
+		FoodWelds: Folder;
+		BodyAlignments: Folder & {
+			AlignCore: AlignPosition;
+			AlignHead: AlignPosition;
+			AlignHeadOrientation: AlignOrientation;
+		};
+		Food: Model;
+		WarpWelds: Folder & {
+			HeadWeld: WeldConstraint;
+			CoreWeld: WeldConstraint;
+		};
+		Head: Part & {
+			HeadAttachment: Attachment;
+		};
+		HumanoidRootPart: Part & {
+			RootAttachment: Attachment;
+		};
+		Humanoid: Humanoid;
+	};
 }

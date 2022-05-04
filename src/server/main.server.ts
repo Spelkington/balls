@@ -7,7 +7,7 @@ Knit.Start();
 Component.Auto(ServerScriptService.TS.Components);
 
 // TODO: Set ball maintenance to service
-let PlayerBalls = new Map<Player, Ball>();
+const PlayerBalls = new Map<Player, Ball>();
 
 Players.PlayerAdded.Connect((player: Player) => {
   PlayerBalls.set(player, new Ball(player));
@@ -19,7 +19,7 @@ Players.PlayerAdded.Connect((player: Player) => {
     Players.CharacterAutoLoads = false;
   });
 
-  while (true) {
+  while (PlayerBalls.has(player)) {
     wait(5);
     print(`Velocity: ${PlayerBalls.get(player)?.Model.Head.AssemblyLinearVelocity.Magnitude}`);
   }

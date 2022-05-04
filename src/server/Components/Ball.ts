@@ -60,7 +60,7 @@ class Ball implements Component.ComponentClass {
   public Warp(position: Vector3, adjustForSize = true) {
     // Activate warp welds to fix everything to the model root before moving
     this.Model.WarpWelds.HeadWeld.Enabled = true;
-    this.Model.WarpWelds.MembraneWeld.Enabled = true;
+    this.Model.WarpWelds.CoreWeld.Enabled = true;
 
     // If an adjustment is requested, move the position up to account for
     // the size of the ball
@@ -73,7 +73,7 @@ class Ball implements Component.ComponentClass {
 
     // Deactivate warp welds to fix everything to the model root after moving
     this.Model.WarpWelds.HeadWeld.Enabled = false;
-    this.Model.WarpWelds.MembraneWeld.Enabled = false;
+    this.Model.WarpWelds.CoreWeld.Enabled = false;
   }
 
   public Kill() {
@@ -144,7 +144,7 @@ class Ball implements Component.ComponentClass {
   }
 
   private AttachFunctionsToBallModel() {
-    this.Model.Membrane.Touched.Connect((otherPart: BasePart) => this.Eat(otherPart));
+    this.Model.Head.Touched.Connect((otherPart: BasePart) => this.Eat(otherPart));
     this.Model.Humanoid.Died.Connect(() => this.Kill());
   }
 
@@ -158,8 +158,8 @@ class Ball implements Component.ComponentClass {
     // Update density from volume and mass
     this.Stats.Density = this.Stats.Mass / this.Stats.Volume;
 
-    // Update Head Size
-    this.Model.Head.Size = Ball.UNIT_VECTOR.mul(this.Stats.Diameter);
+    // Update Core Size
+    this.Model.Core.Size = Ball.UNIT_VECTOR.mul(this.Stats.Diameter);
 
     // Update Root Size
     this.Model.HumanoidRootPart.Size = Ball.UNIT_VECTOR.mul(this.Stats.RootRatio).mul(
@@ -167,11 +167,9 @@ class Ball implements Component.ComponentClass {
     );
 
     // Update Membrane Size
-    this.Model.Membrane.Size = Ball.UNIT_VECTOR.mul(this.Stats.MembraneRatio).mul(
-      this.Stats.Diameter,
-    );
+    this.Model.Head.Size = Ball.UNIT_VECTOR.mul(this.Stats.MembraneRatio).mul(this.Stats.Diameter);
 
-    this.Model.Head.CustomPhysicalProperties = new PhysicalProperties(
+    this.Model.Core.CustomPhysicalProperties = new PhysicalProperties(
       this.Stats.Density,
       this.Stats.Friction,
       this.Stats.Elasticity,
@@ -217,13 +215,13 @@ class Ball implements Component.ComponentClass {
     // Create new weld constraint for the new part
     const weld = new Instance("WeldConstraint");
     weld.Parent = this.Model.FoodWelds;
-    weld.Part0 = this.Model.Membrane;
+    weld.Part0 = this.Model.Head;
     weld.Part1 = part;
 
     // Attach eaten part to membrane
     part.Parent = this.Model.Food;
-    part.Position = this.Model.Membrane.Position.add(
-      part.Position.sub(this.Model.Membrane.Position).Unit.mul(this.Model.Membrane.Size.X / 2),
+    part.Position = this.Model.Head.Position.add(
+      part.Position.sub(this.Model.Head.Position).Unit.mul(this.Model.Head.Size.X / 2),
     );
 
     wait(this.Stats.DigestionTime);
