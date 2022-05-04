@@ -10,18 +10,17 @@ Component.Auto(ServerScriptService.TS.Components);
 let PlayerBalls = new Map<Player, Ball>();
 
 Players.PlayerAdded.Connect((player: Player) => {
+  PlayerBalls.set(player, new Ball(player));
+  player.RespawnLocation = <SpawnLocation>Workspace.FindFirstChild("SpawnLocation");
 
-    PlayerBalls.set(player, new Ball(player));
-    player.RespawnLocation = <SpawnLocation>Workspace.FindFirstChild("SpawnLocation");
+  player.CharacterAdded.Connect((character: Model) => {
+    PlayerBalls.get(player)?.Spawn(new Vector3(0, 100, 0));
+    // TODO: Find a way to remove this :)
+    Players.CharacterAutoLoads = false;
+  });
 
-    player.CharacterAdded.Connect((character: Model) => {
-        PlayerBalls.get(player)?.Spawn(new Vector3(0, 100, 0));
-        // TODO: Find a way to remove this :)
-        Players.CharacterAutoLoads = false;
-    })
-        
-    while (true) {
-        wait(5)
-        print(`Velocity: ${PlayerBalls.get(player)?.Model.Head.AssemblyLinearVelocity.Magnitude}`)
-    }
-})
+  while (true) {
+    wait(5);
+    print(`Velocity: ${PlayerBalls.get(player)?.Model.Head.AssemblyLinearVelocity.Magnitude}`);
+  }
+});

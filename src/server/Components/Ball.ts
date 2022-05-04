@@ -3,275 +3,235 @@ import { Workspace, ServerStorage, CollectionService } from "@rbxts/services";
 import { BallConfiguration } from "server/Configurations/BallConfiguration";
 
 class Ball implements Component.ComponentClass {
+  // ======================
+  // ===== ATTRIBUTES =====
+  // ======================
 
-    // ======================
-    // ===== ATTRIBUTES =====
-    // ======================
+  public static Tag = "Ball";
+  private static BASE_BALL_MODEL: ServerStorage["BallModel"] = ServerStorage.BallModel;
+  private static UNIT_VECTOR: Vector3 = new Vector3(1, 1, 1);
+  private static FOOD_VOLUME_CONSTRAINT = 0.5;
+  private static FOOD_MASS_CONSTRAINT = 0.5;
+  private static LEGAL_FOOD_CHILDREN = new Set<string>(["Texture", "Constraint"]);
 
-    public static Tag = "Ball";
-    private static BASE_BALL_MODEL: ServerStorage["BallModel"] = ServerStorage.BallModel;
-    private static UNIT_VECTOR: Vector3 = new Vector3(1, 1, 1);
-    private static FOOD_VOLUME_CONSTRAINT: number = 0.5;
-    private static FOOD_MASS_CONSTRAINT: number = 0.5;
-    private static LEGAL_FOOD_CHILDREN = new Set<string>([
-        "Texture",
-        "Constraint"
-    ]);
+  public Owner: Player;
+  public BallJanitor: Janitor = new Janitor();
+  public Model: ServerStorage["BallModel"] = Ball.BASE_BALL_MODEL;
+  public IsAlive = false;
 
-    public Owner: Player;
-    public BallJanitor: Janitor = new Janitor();
-    public Model: ServerStorage["BallModel"] = Ball.BASE_BALL_MODEL;
-    public IsAlive: boolean = false;
+  private Stats = new BallConfiguration();
+  // TODO: Set to Array<Food> once food is implemented
+  private FoodQueue = new Array<BasePart>();
 
-    private Stats = new BallConfiguration();
-    // TODO: Set to Array<Food> once food is implemented
-    private FoodQueue = new Array<BasePart>();
+  // ==========================
+  // ===== PUBLIC METHODS =====
+  // ==========================
 
-    // ==========================
-    // ===== PUBLIC METHODS =====
-    // ==========================
+  constructor(player: Player) {
+    // Initialize ball state
+    this.Owner = player;
+    this.IsAlive = false;
+  }
 
-    constructor(player: Player) {
-        // Initialize ball state
-        this.Owner = player;
-        this.IsAlive = false;
-    };
-    
-    public Destroy() {
-        this.BallJanitor.Destroy();
+  public Destroy() {
+    this.BallJanitor.Destroy();
+  }
+
+  public Warp(position: Vector3, adjustForSize = true) {
+    // Activate warp welds to fix everything to the model root before moving
+    this.Model.WarpWelds.HeadWeld.Enabled = true;
+    this.Model.WarpWelds.MembraneWeld.Enabled = true;
+
+    // If an adjustment is requested, move the position up to account for
+    // the size of the ball
+    if (adjustForSize) {
+      position = position.add(new Vector3(0, this.Stats.Diameter / 2, 0));
     }
 
-    public Warp(position: Vector3, adjustForSize: boolean = true) {
-        // Activate warp welds to fix everything to the model root before moving
-        this.Model.WarpWelds.HeadWeld.Enabled = true;
-        this.Model.WarpWelds.MembraneWeld.Enabled = true;
+    // Move to location
+    this.Model.SetPrimaryPartCFrame(new CFrame(position));
 
-        // If an adjustment is requested, move the position up to account for
-        // the size of the ball
-        if (adjustForSize) {
-            position = (
-                position
-                .add(new Vector3(0, this.Stats.Diameter / 2, 0))
-            )
-        }
-        
-        // Move to location
-        this.Model.SetPrimaryPartCFrame(new CFrame(position));
+    // Deactivate warp welds to fix everything to the model root after moving
+    this.Model.WarpWelds.HeadWeld.Enabled = false;
+    this.Model.WarpWelds.MembraneWeld.Enabled = false;
+  }
 
-        // Deactivate warp welds to fix everything to the model root after moving
-        this.Model.WarpWelds.HeadWeld.Enabled = false;
-        this.Model.WarpWelds.MembraneWeld.Enabled = false;
-    }
-    
-    public Kill() {
-        this.Model.Humanoid.TakeDamage(100);
-        this.IsAlive = false;
+  public Kill() {
+    this.Model.Humanoid.TakeDamage(100);
+    this.IsAlive = false;
+  }
+
+  public Spawn(position: Vector3 | undefined = undefined, forceRespawn = false) {
+    // Return if the player is already alive
+    if (this.IsAlive) {
+      if (forceRespawn) {
+        this.Kill();
+      } else {
+        return;
+      }
     }
 
-    public Spawn(
-        position: Vector3 | undefined = undefined,
-        forceRespawn: boolean = false
-    ) {
-
-        // Return if the player is already alive
-        if (this.IsAlive) {
-            if (forceRespawn) {
-                this.Kill()
-            } else {
-                return
-            }
-        }
-
-        // If a position was not provided, set to either the player's respawn location
-        // or to the world origin with a warning.
-        if (!position) {
-            if (this.Owner.RespawnLocation) {
-                position = this.Owner.RespawnLocation!.Position;
-            } else {
-                print(`[WARN] ${this.Owner.Name} did not have a valid respawn location and was spawned to origin.`);
-                position = new Vector3();
-            }
-        }
-
-        // Create new model
-        this.Model = Ball.BASE_BALL_MODEL.Clone();
-        this.AttachFunctionsToBallModel();
-
-        // Initialize new stats
-        this.Stats = new BallConfiguration();
-        this.Update();
-
-        // this.Warp(position!);
-
-        this.Model.Name = this.Owner.Name;
-        this.Model.Parent = Workspace;
-
-        // Swap out & destroy previous character
-        let previousCharacter: Model | undefined = this.Owner.Character;
-        this.Owner.Character = this.Model;
-        previousCharacter?.Destroy();
-
-        // Set player to alive
-        this.IsAlive = true;
-    }
-
-    // ===========================
-    // ===== PRIVATE METHODS =====
-    // ===========================
-
-    private static CleanFood(part: BasePart) {
-        // Break any joints the part may have
-        part.Anchored = false;
-        part.BreakJoints();
-        part.CanCollide = false;
-
-        for (let child of part.GetChildren()) {
-            if (!Ball.LEGAL_FOOD_CHILDREN.has(child.ClassName)) {
-                child.Destroy();
-            }
-        }
-    }
-
-    private AttachFunctionsToBallModel() {
-        this.Model.Membrane.Touched.Connect((otherPart: BasePart) => this.Eat(otherPart));
-        this.Model.Humanoid.Died.Connect(() => this.Kill());
-    }
-
-    private Update(): BallConfiguration {
-
-        // Update top speed based on mass
-        this.Stats.TopSpeed = this.Stats.Mass * this.Stats.TopSpeedMultiplier;
-
-        // Update diameter from volume
-        this.Stats.Diameter = 2 * math.pow(
-            (3 * this.Stats.Volume) / (4 * math.pi),
-            (1 / 3)
-        )
-
-        // Update density from volume and mass
-        this.Stats.Density = this.Stats.Mass / this.Stats.Volume;
-
-        // Update Head Size
-        this.Model.Head.Size = (
-            Ball.UNIT_VECTOR
-            .mul(this.Stats.Diameter)
+    // If a position was not provided, set to either the player's respawn location
+    // or to the world origin with a warning.
+    if (!position) {
+      if (this.Owner.RespawnLocation) {
+        position = this.Owner.RespawnLocation!.Position;
+      } else {
+        print(
+          `[WARN] ${this.Owner.Name} did not have a valid respawn location and was spawned to origin.`,
         );
-
-        // Update Root Size
-        this.Model.HumanoidRootPart.Size = (
-            Ball.UNIT_VECTOR
-            .mul(this.Stats.RootRatio)
-            .mul(this.Stats.Diameter)
-        );
-
-        // Update Membrane Size
-        this.Model.Membrane.Size = (
-            Ball.UNIT_VECTOR
-            .mul(this.Stats.MembraneRatio)
-            .mul(this.Stats.Diameter)
-        );
-
-        this.Model.Head.CustomPhysicalProperties = new PhysicalProperties(
-            this.Stats.Density,
-            this.Stats.Friction,
-            this.Stats.Elasticity,
-            this.Stats.FrictionWeight,
-            this.Stats.ElasticityWeight,
-        )
-
-        this.Model.Humanoid.WalkSpeed = math.clamp(
-            this.Stats.TopSpeed,
-            BallConfiguration.TOP_SPEED_MIN,
-            BallConfiguration.TOP_SPEED_MAX
-        );
-
-        return this.Stats;
+        position = new Vector3();
+      }
     }
 
-    private Excrete() {
-        // TODO: Excrete excess mass
+    // Create new model
+    this.Model = Ball.BASE_BALL_MODEL.Clone();
+    this.AttachFunctionsToBallModel();
+
+    // Initialize new stats
+    this.Stats = new BallConfiguration();
+    this.Update();
+
+    // this.Warp(position!);
+
+    this.Model.Name = this.Owner.Name;
+    this.Model.Parent = Workspace;
+
+    // Swap out & destroy previous character
+    const previousCharacter: Model | undefined = this.Owner.Character;
+    this.Owner.Character = this.Model;
+    previousCharacter?.Destroy();
+
+    // Set player to alive
+    this.IsAlive = true;
+  }
+
+  // ===========================
+  // ===== PRIVATE METHODS =====
+  // ===========================
+
+  private static CleanFood(part: BasePart) {
+    // Break any joints the part may have
+    part.Anchored = false;
+    part.BreakJoints();
+    part.CanCollide = false;
+
+    for (const child of part.GetChildren()) {
+      if (!Ball.LEGAL_FOOD_CHILDREN.has(child.ClassName)) {
+        child.Destroy();
+      }
+    }
+  }
+
+  private AttachFunctionsToBallModel() {
+    this.Model.Membrane.Touched.Connect((otherPart: BasePart) => this.Eat(otherPart));
+    this.Model.Humanoid.Died.Connect(() => this.Kill());
+  }
+
+  private Update(): BallConfiguration {
+    // Update top speed based on mass
+    this.Stats.TopSpeed = this.Stats.Mass * this.Stats.TopSpeedMultiplier;
+
+    // Update diameter from volume
+    this.Stats.Diameter = 2 * math.pow((3 * this.Stats.Volume) / (4 * math.pi), 1 / 3);
+
+    // Update density from volume and mass
+    this.Stats.Density = this.Stats.Mass / this.Stats.Volume;
+
+    // Update Head Size
+    this.Model.Head.Size = Ball.UNIT_VECTOR.mul(this.Stats.Diameter);
+
+    // Update Root Size
+    this.Model.HumanoidRootPart.Size = Ball.UNIT_VECTOR.mul(this.Stats.RootRatio).mul(
+      this.Stats.Diameter,
+    );
+
+    // Update Membrane Size
+    this.Model.Membrane.Size = Ball.UNIT_VECTOR.mul(this.Stats.MembraneRatio).mul(
+      this.Stats.Diameter,
+    );
+
+    this.Model.Head.CustomPhysicalProperties = new PhysicalProperties(
+      this.Stats.Density,
+      this.Stats.Friction,
+      this.Stats.Elasticity,
+      this.Stats.FrictionWeight,
+      this.Stats.ElasticityWeight,
+    );
+
+    this.Model.Humanoid.WalkSpeed = math.clamp(
+      this.Stats.TopSpeed,
+      BallConfiguration.TOP_SPEED_MIN,
+      BallConfiguration.TOP_SPEED_MAX,
+    );
+
+    return this.Stats;
+  }
+
+  private Excrete() {
+    // TODO: Excrete excess mass
+  }
+
+  private Digest(part: BasePart) {
+    // Update stats
+    this.Stats.Volume += part.Mass / part.CustomPhysicalProperties.Density;
+    this.Stats.Mass += part.Mass;
+
+    // Destroy part & weld
+    part.Destroy();
+
+    if (part.Parent?.GetChildren().isEmpty()) {
+      part.Parent.Destroy();
+    }
+  }
+
+  private Eat(part: BasePart) {
+    // Don't eat if the part isn't eatable
+    if (!this.IsEatable(part)) {
+      return;
     }
 
-    private Digest(part: BasePart) {
-        // Update stats
-        this.Stats.Volume += part.Mass / part.CustomPhysicalProperties.Density;
-        this.Stats.Mass += part.Mass
+    // Clean the food
+    Ball.CleanFood(part);
 
-        // Destroy part & weld
-        part.Destroy()
+    // Create new weld constraint for the new part
+    const weld = new Instance("WeldConstraint");
+    weld.Parent = this.Model.FoodWelds;
+    weld.Part0 = this.Model.Membrane;
+    weld.Part1 = part;
 
-        if (part.Parent?.GetChildren().isEmpty()) {
-            part.Parent.Destroy();
-        }
+    // Attach eaten part to membrane
+    part.Parent = this.Model.Food;
+    part.Position = this.Model.Membrane.Position.add(
+      part.Position.sub(this.Model.Membrane.Position).Unit.mul(this.Model.Membrane.Size.X / 2),
+    );
+
+    wait(this.Stats.DigestionTime);
+
+    this.Digest(part);
+
+    weld.Destroy();
+
+    this.Update();
+  }
+
+  private IsEatable(part: BasePart) {
+    const isEatable = CollectionService.HasTag(part, "Edible");
+
+    // Short-circuit return if the prereqs aren't met
+    if (!isEatable) {
+      return false;
     }
 
-    private Eat(part: BasePart) {
+    const partVolume = part.Mass / part.CustomPhysicalProperties.Density;
+    const partMaxSize = math.max(part.Size.X, part.Size.Y, part.Size.Z);
 
-        // Don't eat if the part isn't eatable
-        if (!this.IsEatable(part)) {return;};
-
-        // Clean the food
-        Ball.CleanFood(part);
-
-        // Create new weld constraint for the new part
-        let weld = new Instance("WeldConstraint");
-        weld.Parent = this.Model.FoodWelds;
-        weld.Part0 = this.Model.Membrane;
-        weld.Part1 = part;
-
-        // Attach eaten part to membrane
-        part.Parent = this.Model.Food
-        part.Position = (
-            this.Model.Membrane.Position
-            .add(
-                part.Position
-                .sub(this.Model.Membrane.Position)
-                .Unit
-                .mul(this.Model.Membrane.Size.X / 2)
-            )
-        );
-
-        wait(this.Stats.DigestionTime);
-
-        this.Digest(part);
-
-        weld.Destroy()
-
-        this.Update();
-    }
-    
-    private IsEatable(part: BasePart) {
-        let isEatable = CollectionService.HasTag(part, "Edible");
-
-        // Short-circuit return if the prereqs aren't met
-        if (!isEatable) {return false};
-
-        let partVolume = part.Mass / part.CustomPhysicalProperties.Density;
-        let partMaxSize = math.max(
-            part.Size.X,
-            part.Size.Y,
-            part.Size.Z
-        )
-
-        return (
-            (
-                (
-                    this.Stats.Volume
-                    * this.Stats.MembraneRatio
-                    * Ball.FOOD_VOLUME_CONSTRAINT
-                ) > partVolume
-            )
-            && (
-                (
-                    this.Stats.Diameter
-                    * this.Stats.MembraneRatio
-                    * Ball.FOOD_VOLUME_CONSTRAINT
-                ) > partMaxSize
-            )
-            && (this.Stats.Mass > (part.Mass * Ball.FOOD_MASS_CONSTRAINT))
-        )
-    }
-
-};
+    return (
+      this.Stats.Volume * this.Stats.MembraneRatio * Ball.FOOD_VOLUME_CONSTRAINT > partVolume &&
+      this.Stats.Diameter * this.Stats.MembraneRatio * Ball.FOOD_VOLUME_CONSTRAINT > partMaxSize &&
+      this.Stats.Mass > part.Mass * Ball.FOOD_MASS_CONSTRAINT
+    );
+  }
+}
 
 export = Ball;
