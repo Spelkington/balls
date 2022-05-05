@@ -2,9 +2,9 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
   [
     "Plastic",
     new PhysicalProperties(
-      1, // Density
+      0.3, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -12,7 +12,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -20,7 +20,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -28,7 +28,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -36,7 +36,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -44,7 +44,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -52,23 +52,23 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
     "Grass",
     new PhysicalProperties(
-      0.5, // Density
+      0.15, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
     "Ice",
     new PhysicalProperties(
       1, // Density
-      1, // Friction
-      1, // Elasticity
+      0.1, // Friction
+      0, // Elasticity
     ),
   ],
   [
@@ -76,7 +76,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -84,7 +84,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -92,7 +92,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -100,7 +100,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -108,7 +108,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -116,15 +116,15 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
     "SmoothPlastic",
     new PhysicalProperties(
-      1, // Density
+      0.25, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -132,7 +132,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       5, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -140,7 +140,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -148,7 +148,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -156,7 +156,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -164,7 +164,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -172,7 +172,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -180,7 +180,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -188,7 +188,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -196,7 +196,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -204,7 +204,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -212,7 +212,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -220,7 +220,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -228,7 +228,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -236,7 +236,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -244,7 +244,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -252,15 +252,15 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
     "LeafyGrass",
     new PhysicalProperties(
-      1, // Density
+      0.2, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -268,7 +268,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -276,7 +276,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -284,7 +284,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       1, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
   [
@@ -292,7 +292,7 @@ const EdibleMaterialConfiguration = new Map<string, PhysicalProperties>([
     new PhysicalProperties(
       0.001, // Density
       1, // Friction
-      1, // Elasticity
+      0, // Elasticity
     ),
   ],
 ]);
